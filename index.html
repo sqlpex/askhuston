@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#13131a',
+            card:    '#1a1a24',
+            border:  'rgba(255,255,255,0.07)',
+          },
+          backdropBlur: { xs: '2px' },
+          keyframes: {
+            'fade-up':   { '0%': { opacity: '0', transform: 'translateY(16px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            'pop':       { '0%': { opacity: '0', transform: 'scale(.92) translateY(12px)' }, '100%': { opacity: '1', transform: 'scale(1) translateY(0)' } },
+            'float':     { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
+            'glow-pulse':{ '0%,100%': { opacity: '.55' }, '50%': { opacity: '1' } },
+            'orb1':      { '0%,100%': { transform: 'translate(0,0)' }, '50%': { transform: 'translate(60px,-40px)' } },
+            'orb2':      { '0%,100%': { transform: 'translate(0,0)' }, '50%': { transform: 'translate(-50px,30px)' } },
+            'shimmer':   { '0%': { backgroundPosition: '-400px 0' }, '100%': { backgroundPosition: '400px 0' } },
+            'scan':      { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(400%)' } },
+          },
+          animation: {
+            'fade-up':    'fade-up .45s cubic-bezier(.16,1,.3,1) both',
+            'pop':        'pop .4s cubic-bezier(.16,1,.3,1) both',
+            'float':      'float 3.6s ease-in-out infinite',
+            'glow-pulse': 'glow-pulse 2.4s ease-in-out infinite',
+            'orb1':       'orb1 8s ease-in-out infinite',
+            'orb2':       'orb2 11s ease-in-out infinite',
+            'shimmer':    'shimmer 2.2s linear infinite',
+            'scan':       'scan 2s cubic-bezier(.4,0,.6,1) infinite',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0c0c14;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Stagger delays ── */
+    .item-1 { animation-delay: .08s }
+    .item-2 { animation-delay: .14s }
+    .item-3 { animation-delay: .20s }
+    .item-4 { animation-delay: .26s }
+    .item-5 { animation-delay: .32s }
+    .item-6 { animation-delay: .38s }
+
+    /* ── Glassmorphism card ── */
+    .glass {
+      background: linear-gradient(135deg, rgba(30,30,44,.92) 0%, rgba(20,20,32,.96) 100%);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    /* ── Glow ring around card ── */
+    .card-glow {
+      box-shadow:
+        0 0 0 1px rgba(99,106,247,.18),
+        0 0 60px rgba(99,106,247,.12),
+        0 32px 80px rgba(0,0,0,.65),
+        0 8px 24px rgba(0,0,0,.5);
+    }
+
+    /* ── Menu item hover highlight ── */
+    .menu-row {
+      position: relative;
+      transition: background .15s;
+    }
+    .menu-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: linear-gradient(180deg, #636af7, #a78bfa);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .menu-row:hover::before { opacity: 1; }
+    .menu-row:hover { background: rgba(99,106,247,.07); }
+
+    /* ── Action button shimmer ── */
+    .btn-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shimmer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%);
+      background-size: 400px 100%;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .btn-shimmer:hover::after {
+      opacity: 1;
+      animation: shimmer 1.2s linear infinite;
+    }
+
+    /* ── Search focus glow ── */
+    .search-wrap:focus-within {
+      box-shadow: 0 0 0 2px rgba(99,106,247,.4), 0 0 20px rgba(99,106,247,.15);
+    }
+
+    /* ── Scan line on search focus ── */
+    .scan-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 60px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .search-wrap:focus-within .scan-line {
+      opacity: 1;
+      animation: scan 2s linear infinite;
+    }
+
+    /* ── Icon glow on hover ── */
+    .icon-wrap { transition: transform .2s, filter .2s; }
+    .menu-row:hover .icon-wrap { transform: scale(1.12); filter: brightness(1.2); }
+
+    /* ── KBD badge ── */
+    .kbd-badge {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 10.5px;
+      letter-spacing: .04em;
+    }
+
+    /* ── Social hover ── */
+    .social-pill { transition: background .15s, transform .15s; }
+    .social-pill:hover { transform: translateX(3px); }
+
+    /* ── Custom scrollbar (unused but good practice) ── */
+    ::-webkit-scrollbar { width: 0; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center gap-6 overflow-hidden relative py-12">
+
+  <!-- ── Animated background orbs ── -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="animate-orb1 absolute top-1/4 left-1/4 w-96 h-96 rounded-full"
+         style="background:radial-gradient(circle, rgba(79,90,247,.22) 0%, transparent 70%); filter:blur(48px)"></div>
+    <div class="animate-orb2 absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full"
+         style="background:radial-gradient(circle, rgba(139,92,246,.18) 0%, transparent 70%); filter:blur(56px)"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
+         style="background:radial-gradient(circle, rgba(99,106,247,.06) 0%, transparent 65%); filter:blur(32px)"></div>
+  </div>
+
+  <!-- ── Noise texture overlay ── -->
+  <div class="pointer-events-none fixed inset-0 opacity-[0.025]"
+       style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22 opacity=%221%22/></svg>')">
+  </div>
+
+  <!-- ── Brand title ── -->
+  <div class="relative z-10 flex justify-center">
+    <div class="text-center select-none" style="animation: fade-up .6s cubic-bezier(.16,1,.3,1) both; animation-delay:.05s">
+      <!-- Ambient glow behind text -->
+      <div class="absolute inset-0 pointer-events-none"
+           style="background:radial-gradient(ellipse 60% 40% at 50% 60%, rgba(99,106,247,.22), transparent); filter:blur(18px); transform:translateY(8px)"></div>
+
+      <h1 class="relative font-semibold tracking-tight"
+          style="
+            font-size: clamp(2.6rem, 6vw, 3.6rem);
+            letter-spacing: -.03em;
+            background: linear-gradient(135deg,
+              #ffffff 0%,
+              #c8d0ff 28%,
+              #a78bfa 52%,
+              #636af7 75%,
+              #93c5fd 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 28px rgba(99,106,247,.5)) drop-shadow(0 2px 6px rgba(0,0,0,.4));
+          ">
+        askHuston
+      </h1>
+
+      <!-- Underline shimmer bar -->
+      <div class="relative mx-auto mt-2 h-px overflow-hidden rounded-full" style="width:60%">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(99,106,247,.7),rgba(167,139,250,.8),rgba(99,106,247,.7),transparent)"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 50%,transparent 100%);background-size:200% 100%;animation:shimmer 2.4s linear infinite"></div>
+      </div>
+
+      <!-- Tagline -->
+      <p class="mt-2 text-[12.5px] tracking-widest uppercase font-medium"
+         style="color:rgba(255,255,255,.25); letter-spacing:.18em; animation: fade-up .5s cubic-bezier(.16,1,.3,1) both; animation-delay:.18s">
+        AI · Design · Community
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Spotlight card ── -->
+  <div class="animate-pop glass card-glow rounded-2xl w-[540px] max-w-[94vw] overflow-hidden relative z-10">
+
+    <!-- Top glow line -->
+    <div class="absolute top-0 left-8 right-8 h-px"
+         style="background:linear-gradient(90deg, transparent, rgba(99,106,247,.6), rgba(167,139,250,.6), transparent)"></div>
+
+    <!-- ── Mascot ── -->
+    <div class="flex justify-center pt-8 pb-2">
+      <div class="animate-float relative">
+        <!-- Glow under mascot -->
+        <div class="animate-glow-pulse absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-4 rounded-full"
+             style="background:radial-gradient(ellipse, rgba(99,106,247,.5), transparent 70%); filter:blur(6px)"></div>
+        <svg width="82" height="82" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#5b7ef7"/>
+              <stop offset="100%" stop-color="#2a4fd6"/>
+            </linearGradient>
+            <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#dce8ff"/>
+              <stop offset="100%" stop-color="#a8c0f0"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Shadow -->
+          <ellipse cx="52" cy="96" rx="20" ry="4" fill="rgba(0,0,0,.3)"/>
+          <!-- Wings -->
+          <ellipse cx="20" cy="54" rx="24" ry="10" fill="url(#wingGrad)" transform="rotate(-22 20 54)" opacity=".95"/>
+          <ellipse cx="16" cy="56" rx="17" ry="7"  fill="#c0d4f8" transform="rotate(-22 16 56)"/>
+          <ellipse cx="84" cy="58" rx="16" ry="8"  fill="url(#wingGrad)" transform="rotate(18 84 58)" opacity=".7"/>
+          <!-- Body -->
+          <ellipse cx="54" cy="60" rx="22" ry="18" fill="url(#bodyGrad)" filter="url(#glow)"/>
+          <!-- Head -->
+          <circle cx="58" cy="40" r="21" fill="url(#bodyGrad)" filter="url(#glow)"/>
+          <!-- Ears -->
+          <polygon points="44,23 40,8  55,21" fill="#3a5ee0"/>
+          <polygon points="73,21 77,7  65,20" fill="#3a5ee0"/>
+          <polygon points="46,21 43,13 54,20" fill="#7a9af8"/>
+          <polygon points="71,20 75,12 65,19" fill="#7a9af8"/>
+          <!-- Face whites -->
+          <circle cx="53" cy="39" r="5" fill="white"/>
+          <circle cx="65" cy="39" r="5" fill="white"/>
+          <!-- Pupils -->
+          <circle cx="54" cy="40" r="2.8" fill="#0d0d1a"/>
+          <circle cx="66" cy="40" r="2.8" fill="#0d0d1a"/>
+          <!-- Highlights -->
+          <circle cx="55.2" cy="38.8" r="1.1" fill="white"/>
+          <circle cx="67.2" cy="38.8" r="1.1" fill="white"/>
+          <!-- Nose -->
+          <ellipse cx="59" cy="46.5" rx="3.5" ry="2.2" fill="#4a6ee0"/>
+          <!-- Mouth -->
+          <path d="M55.5 49 Q59 52.5 62.5 49" fill="none" stroke="#3a5ed0" stroke-width="1.4" stroke-linecap="round"/>
+          <!-- Whiskers -->
+          <line x1="62" y1="47" x2="74" y2="45" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+          <line x1="62" y1="48.5" x2="74" y2="49" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+          <line x1="56" y1="47" x2="44" y2="45" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+          <line x1="56" y1="48.5" x2="44" y2="49" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+          <!-- Tail -->
+          <path d="M70 75 Q90 82 84 63 Q80 50 68 62" fill="#4a6ef0"/>
+          <path d="M72 74 Q88 79 83 65 Q80 55 70 64" fill="#5b7ef7" opacity=".6"/>
+          <!-- Body shine -->
+          <ellipse cx="46" cy="54" rx="7" ry="4" fill="rgba(255,255,255,.12)" transform="rotate(-20 46 54)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── Search ── -->
+    <div class="px-4 pb-1 pt-3">
+      <div class="search-wrap relative flex items-center gap-3 rounded-xl px-3.5 h-12 transition-all duration-200"
+           style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08)">
+        <div class="scan-line rounded"></div>
+        <svg class="opacity-35 shrink-0" width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="4.5" stroke="#e5e5e7" stroke-width="1.5"/>
+          <path d="M10 10L14 14" stroke="#e5e5e7" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="text" placeholder="Search…"
+               class="flex-1 bg-transparent border-none outline-none text-sm text-white/80 placeholder-white/25 font-normal"
+               style="letter-spacing:.01em" />
+        <kbd class="kbd-badge px-1.5 py-0.5 rounded-md text-white/25"
+             style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)">⌘K</kbd>
+      </div>
+    </div>
+
+    <!-- ── Divider ── -->
+    <div class="mx-4 mt-3 mb-1 h-px" style="background:rgba(255,255,255,.06)"></div>
+
+    <!-- ── Menu items ── -->
+    <nav class="py-1.5">
+
+      <!-- Course -->
+      <a href="#" class="menu-row animate-fade-up item-1 flex items-center gap-3 px-4 py-2.5 cursor-pointer no-underline group">
+        <div class="icon-wrap w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+             style="background:linear-gradient(135deg,#3b5bdb,#5b7ef7); box-shadow:0 4px 12px rgba(59,91,219,.4)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M8 1l1.9 3.8 4.2.6-3 3 .7 4.2L8 10.5 4.2 12.6l.7-4.2-3-3 4.2-.6z"/></svg>
+        </div>
+        <div class="flex-1 flex items-baseline gap-2 min-w-0">
+          <span class="text-[13.5px] font-medium text-white/85">Course</span>
+          <span class="text-[11.5px] text-white/35 truncate">Learn Prompting &amp; AI Design</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <kbd class="kbd-badge px-1.5 py-0.5 rounded-md text-white/55"
+               style="background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14)">⌘C</kbd>
+          <span class="btn-shimmer text-[11.5px] text-white/75 px-2.5 py-0.5 rounded-md cursor-pointer transition-colors duration-150 hover:text-white"
+                style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16)">Learn</span>
+        </div>
+      </a>
+
+      <!-- Community -->
+      <a href="#" class="menu-row animate-fade-up item-2 flex items-center gap-3 px-4 py-2.5 cursor-pointer no-underline group">
+        <div class="icon-wrap w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+             style="background:linear-gradient(135deg,#6741d9,#9b5cf6); box-shadow:0 4px 12px rgba(103,65,217,.4)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width=".5" fill="white"/></svg>
+        </div>
+        <div class="flex-1 flex items-baseline gap-2 min-w-0">
+          <span class="text-[13.5px] font-medium text-white/85">Community</span>
+          <span class="text-[11.5px] text-white/35 truncate">Join our Skool Community</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <kbd class="kbd-badge px-1.5 py-0.5 rounded-md text-white/55"
+               style="background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14)">⌘M</kbd>
+          <span class="btn-shimmer text-[11.5px] text-white/75 px-2.5 py-0.5 rounded-md cursor-pointer transition-colors duration-150 hover:text-white"
+                style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16)">Join</span>
+        </div>
+      </a>
+
+      <!-- Work With Me -->
+      <a href="#" class="menu-row animate-fade-up item-3 flex items-center gap-3 px-4 py-2.5 cursor-pointer no-underline group">
+        <div class="icon-wrap w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+             style="background:linear-gradient(135deg,#0d7377,#14a085); box-shadow:0 4px 12px rgba(13,115,119,.4)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>
+        </div>
+        <div class="flex-1 flex items-baseline gap-2 min-w-0">
+          <span class="text-[13.5px] font-medium text-white/85">Work With Me</span>
+          <span class="text-[11.5px] text-white/35 truncate">Projects &amp; Collab</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <kbd class="kbd-badge px-1.5 py-0.5 rounded-md text-white/55"
+               style="background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14)">⌘9</kbd>
+          <span class="btn-shimmer text-[11.5px] text-white/75 px-2.5 py-0.5 rounded-md cursor-pointer transition-colors duration-150 hover:text-white"
+                style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16)">Contact</span>
+        </div>
+      </a>
+
+      <!-- Work With Freelancers -->
+      <a href="#" class="menu-row animate-fade-up item-4 flex items-center gap-3 px-4 py-2.5 cursor-pointer no-underline group">
+        <div class="icon-wrap w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+             style="background:linear-gradient(135deg,#4338ca,#6d6af7); box-shadow:0 4px 12px rgba(67,56,202,.4)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><circle cx="5" cy="8" r="2.5"/><circle cx="11" cy="8" r="2.5"/><path d="M5 5.5 Q8 2.5 11 5.5" fill="none" stroke="white" stroke-width="1.2"/></svg>
+        </div>
+        <div class="flex-1 flex items-baseline gap-2 min-w-0">
+          <span class="text-[13.5px] font-medium text-white/85">Work With Freelancers</span>
+          <span class="text-[11.5px] text-white/35 truncate">Selected AI Artists</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <kbd class="kbd-badge px-1.5 py-0.5 rounded-md text-white/55"
+               style="background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14)">⌘F</kbd>
+          <span class="btn-shimmer text-[11.5px] text-white/75 px-2.5 py-0.5 rounded-md cursor-pointer transition-colors duration-150 hover:text-white"
+                style="background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16)">Browse</span>
+        </div>
+      </a>
+    </nav>
+
+    <!-- ── Divider ── -->
+    <div class="mx-4 h-px" style="background:rgba(255,255,255,.06)"></div>
+
+    <!-- ── Footer quick links ── -->
+    <div class="animate-fade-up item-5 flex items-center justify-between px-4 py-2.5">
+      <a href="#" class="flex items-center gap-2 text-[12px] text-white/60 hover:text-white/85 transition-colors duration-150 no-underline group">
+        <svg class="opacity-60 group-hover:opacity-100 transition-opacity" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm-.75 2.5v3.75l2.5 1.44-.5.87-3-1.73V5.5h1z"/>
+        </svg>
+        Free Resources &amp; Newsletter
+      </a>
+      <a href="#" class="flex items-center gap-2 text-[12px] text-white/60 hover:text-white/85 transition-colors duration-150 no-underline group">
+        <svg class="opacity-60 group-hover:opacity-100 transition-opacity" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2 3h12v2H2zm2 4h8v2H4zm2 4h4v2H6z"/>
+        </svg>
+        Prompts
+      </a>
+    </div>
+
+    <!-- ── Divider ── -->
+    <div class="mx-4 h-px" style="background:rgba(255,255,255,.06)"></div>
+
+    <!-- ── Social ── -->
+    <div class="animate-fade-up item-6 px-4 pt-3 pb-2">
+      <p class="text-[10.5px] text-white/50 uppercase tracking-widest mb-2.5 font-medium">Follow for more</p>
+      <div class="grid grid-cols-2 gap-0.5">
+
+        <a href="#" class="social-pill flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] text-white/65 hover:text-white/90 no-underline"
+           style="transition:background .15s, transform .15s">
+          <!-- Instagram -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
+            <rect x="2" y="2" width="20" height="20" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/>
+          </svg>
+          Instagram
+        </a>
+
+        <a href="#" class="social-pill flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] text-white/65 hover:text-white/90 no-underline">
+          <!-- TikTok -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="opacity-90">
+            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+          </svg>
+          TikTok
+        </a>
+
+        <a href="#" class="social-pill flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] text-white/65 hover:text-white/90 no-underline">
+          <!-- LinkedIn -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="opacity-90">
+            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+          LinkedIn
+        </a>
+
+        <a href="#" class="social-pill flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] text-white/65 hover:text-white/90 no-underline">
+          <!-- X -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="opacity-90">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          X
+        </a>
+
+        <a href="#" class="social-pill flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] text-white/65 hover:text-white/90 no-underline">
+          <!-- Threads -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="opacity-90">
+            <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 013.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.583-1.289-.878-2.309-.882h-.01c-.81 0-1.592.324-.807.624l-1.498-1.38c.684-.744 1.695-1.158 2.886-1.162h.018c1.524.006 2.737.495 3.512 1.387.76.877 1.14 2.116 1.131 3.682v.005c1.097.584 1.945 1.43 2.47 2.632.823 1.888.787 4.59-1.384 6.703-1.813 1.77-3.991 2.606-7.297 2.629z"/>
+          </svg>
+          Threads
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Divider ── -->
+    <div class="mx-4 h-px" style="background:rgba(255,255,255,.06)"></div>
+
+    <!-- ── Bottom bar ── -->
+    <div class="flex items-center justify-between px-4 py-3">
+      <span class="text-[11px] text-white/45">
+        Press <kbd class="kbd-badge mx-0.5 px-1.5 py-0.5 rounded text-white/45"
+                   style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07)">⌘K</kbd>
+        to open commands
+      </span>
+      <span class="text-[11px] text-white/45">ESC to cancel</span>
+    </div>
+
+    <!-- Bottom glow line -->
+    <div class="absolute bottom-0 left-8 right-8 h-px"
+         style="background:linear-gradient(90deg, transparent, rgba(99,106,247,.2), transparent)"></div>
+  </div>
+
+  <script>
+    // ── Keyboard interactions ──
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.querySelector('input').focus();
+      }
+      if (e.key === 'Escape') document.querySelector('input').blur();
+    });
+
+    // ── Ripple on menu item click ──
+    document.querySelectorAll('.menu-row').forEach(row => {
+      row.addEventListener('click', function(e) {
+        const r = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        r.style.cssText = `
+          position:absolute; border-radius:50%;
+          width:${size}px; height:${size}px;
+          left:${e.clientX - rect.left - size/2}px;
+          top:${e.clientY - rect.top - size/2}px;
+          background:rgba(99,106,247,.15);
+          transform:scale(0); pointer-events:none;
+          animation: ripple .55s ease-out forwards;
+        `;
+        this.style.position = 'relative';
+        this.style.overflow = 'hidden';
+        this.appendChild(r);
+        setTimeout(() => r.remove(), 600);
+      });
+    });
+
+    // ── Inject ripple keyframe ──
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to { transform: scale(2.5); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // ── Parallax orbs on mouse move ──
+    document.addEventListener('mousemove', e => {
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
+      const orbs = document.querySelectorAll('.pointer-events-none.fixed > div');
+      if (orbs[0]) orbs[0].style.transform = `translate(${dx * 18}px, ${dy * 12}px)`;
+      if (orbs[1]) orbs[1].style.transform = `translate(${-dx * 14}px, ${-dy * 10}px)`;
+    });
+  </script>
+</body>
+</html>
